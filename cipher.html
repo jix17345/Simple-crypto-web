@@ -1,0 +1,172 @@
+
+  <style>
+
+    body {
+      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+   
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+
+    input {
+      width: 300px;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4285f4;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0f4b6e;
+    }
+
+ 
+
+    </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption and Decryption</title>
+</head>
+<body>
+    <h1>Encryption and Decryption</h1>
+
+    <h2>Encryption</h2>
+    <form id="encryptionForm" onsubmit="encrypt(event)">
+        <label for="inputPlaintext">Enter plaintext:</label><br>
+        <input type="text" id="inputPlaintext" name="plaintext" required><br>
+
+        <label for="inputKey">Enter key:</label><br>
+        <input type="text" id="inputKey" name="key" required><br>
+
+        <button type="submit">Encrypt</button>
+    </form>
+
+    <h2>Decryption</h2>
+    <form id="decryptionForm" onsubmit="decrypt(event)">
+        <label for="inputCiphertext">Enter ciphertext:</label><br>
+        <input type="text" id="inputCiphertext" name="ciphertext" required><br>
+
+        <label for="inputKeyDec">Enter key:</label><br>
+        <input type="text" id="inputKeyDec" name="key" required><br>
+
+        <button type="submit">Decrypt</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        function encrypt(event) {
+            event.preventDefault();
+
+            var plaintext = document.getElementById("inputPlaintext").value.toLowerCase();
+            var key = document.getElementById("inputKey").value.toLowerCase();
+            var cipher = '';
+
+            var x = plaintext.length - key.length;
+            if (key.length < plaintext.length) {
+                for (var i = 0; i < x; i++) {
+                    var char1 = key.charAt(i % 26);
+                    var num1 = char1.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+                    var encryptedChar = String.fromCharCode((num1 % 26) + 'a'.charCodeAt(0));
+                    key = key + encryptedChar;
+                }
+            }
+
+            var maxLength = Math.max(plaintext.length, key.length);
+            var p = 0;
+
+            for (var i = 0; i < maxLength; i++) {
+                var char1 = plaintext.charAt(i);
+
+                if (char1 === ' ') {
+                    cipher += ' ';
+                    continue;
+                }
+
+                var char2 = key.charAt(p);
+                var num1 = char1.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+                var num2 = char2.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+
+                var sum = (num1 + num2) % 26;
+                if (sum === 0) {
+                    sum += 26;
+                }
+
+                var encryptedChar = String.fromCharCode((sum - 1) + 'a'.charCodeAt(0));
+                cipher += encryptedChar;
+                p++;
+            }
+
+            document.getElementById("result").textContent = "\nCipher text is: " + cipher;
+        }
+function decrypt(event) {
+    event.preventDefault();
+
+    var ciphertext = document.getElementById("inputCiphertext").value.toLowerCase();
+    var key = document.getElementById("inputKeyDec").value.toLowerCase();
+    var plaintext = '';
+
+    var x = ciphertext.length - key.length;
+    if (key.length < ciphertext.length) {
+        for (var i = 0; i < x; i++) {
+            var char1 = key.charAt(i % 26);
+            var num1 = char1.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+            var encryptedChar = String.fromCharCode((num1 % 26) + 'a'.charCodeAt(0));
+            key = key + encryptedChar;
+        }
+    }
+
+    var p = 0;
+    for (var i = 0; i < ciphertext.length; i++) {
+        var resultChar = ciphertext.charAt(i);
+
+        if (resultChar === ' ') {
+            plaintext += ' ';
+            continue;
+        }
+
+        var char2 = key.charAt(p);
+        var num1 = resultChar.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+        var num2 = char2.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+        var diff = (num1 - num2) % 26;
+
+        if (diff <= 0) {
+            diff += 26;
+        }
+
+        var decryptedChar = String.fromCharCode((diff - 1 + 26) % 26 + 'a'.charCodeAt(0));
+        plaintext += decryptedChar;
+        p++;
+    }
+
+    document.getElementById("result").textContent = "Plain text is: " + plaintext;
+}    
+</script>
+</body>
+</html>
